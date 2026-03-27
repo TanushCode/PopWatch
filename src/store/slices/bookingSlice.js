@@ -30,6 +30,8 @@ const bookingSlice = createSlice({
     },
     setSelectedShowtime: (state, action) => {
       state.selectedShowtime = action.payload;
+      state.selectedSeats = [];
+      state.totalPrice = 0;
     },
     addSeat: (state, action) => {
       state.selectedSeats.push(action.payload);
@@ -45,12 +47,31 @@ const bookingSlice = createSlice({
     },
     confirmBooking: (state) => {
       if (state.selectedMovie && state.selectedShowtime && state.selectedSeats.length > 0) {
+        const alreadyBookedSeats = state.bookings
+          .filter(booking => {
+            const sameMovie = booking.movieId
+              ? booking.movieId === state.selectedMovie.id
+              : booking.movie === state.selectedMovie.title;
+
+            return sameMovie && booking.showtime === state.selectedShowtime;
+          })
+          .flatMap(booking => booking.seats);
+
+        const seatsToBook = state.selectedSeats.filter(
+          seat => !alreadyBookedSeats.includes(seat)
+        );
+
+        if (seatsToBook.length === 0) {
+          return;
+        }
+
         const booking = {
           id: Date.now(),
+          movieId: state.selectedMovie.id,
           movie: state.selectedMovie.title,
           showtime: state.selectedShowtime,
-          seats: state.selectedSeats,
-          totalPrice: state.totalPrice,
+          seats: seatsToBook,
+          totalPrice: seatsToBook.length * state.selectedMovie.price,
           bookingDate: new Date().toLocaleDateString(),
         };
         state.bookings.push(booking);

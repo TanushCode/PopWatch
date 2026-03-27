@@ -16,12 +16,27 @@ function MovieDetails() {
   }
 
   const seats = ['A1', 'A2', 'A3', 'A4', 'B1', 'B2', 'B3', 'B4', 'C1', 'C2', 'C3', 'C4'];
+  const bookedSeatsForShow = booking.bookings
+    .filter(existingBooking => {
+      const sameMovie = existingBooking.movieId
+        ? existingBooking.movieId === movie.id
+        : existingBooking.movie === movie.title;
+
+      return sameMovie && existingBooking.showtime === booking.selectedShowtime;
+    })
+    .flatMap(existingBooking => existingBooking.seats);
+  const bookedSeatsSet = new Set(bookedSeatsForShow);
+  const availableSeatsCount = seats.filter(seat => !bookedSeatsSet.has(seat)).length;
 
   const handleSelectShowtime = (showtime) => {
     dispatch(setSelectedShowtime(showtime));
   };
 
   const handleSelectSeat = (seat) => {
+    if (bookedSeatsSet.has(seat)) {
+      return;
+    }
+
     if (booking.selectedSeats.includes(seat)) {
       dispatch(removeSeat(seat));
     } else {
@@ -71,18 +86,29 @@ function MovieDetails() {
           {booking.selectedShowtime && (
             <>
               <h2>Select Seats</h2>
+              <p className="seat-legend">
+                <span className="legend-available">Available: {availableSeatsCount}</span>
+                <span className="legend-booked">Booked: {bookedSeatsForShow.length}</span>
+              </p>
               <div className="seating-area">
                 <div className="screen">Screen</div>
                 <div className="seats-grid">
-                  {seats.map(seat => (
-                    <button
-                      key={seat}
-                      className={`seat ${booking.selectedSeats.includes(seat) ? 'selected' : ''}`}
-                      onClick={() => handleSelectSeat(seat)}
-                    >
-                      {seat}
-                    </button>
-                  ))}
+                  {seats.map(seat => {
+                    const isBooked = bookedSeatsSet.has(seat);
+                    const isSelected = booking.selectedSeats.includes(seat);
+
+                    return (
+                      <button
+                        key={seat}
+                        className={`seat ${isSelected ? 'selected' : ''} ${isBooked ? 'unavailable' : ''}`}
+                        onClick={() => handleSelectSeat(seat)}
+                        disabled={isBooked}
+                        title={isBooked ? 'Seat already booked' : 'Seat available'}
+                      >
+                        {seat}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
