@@ -1,8 +1,10 @@
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { deleteBooking } from '../store/slices/bookingSlice';
 
 function Bookings() {
   const bookings = useSelector(state => state.booking.bookings);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   return (
@@ -43,6 +45,12 @@ function Bookings() {
                     <span className="amount">₹{booking.totalPrice}</span>
                   </div>
                 </div>
+                <button 
+                  className="btn-delete" 
+                  onClick={() => dispatch(deleteBooking(booking.id))}
+                >
+                  Delete Booking
+                </button>
               </div>
             ))}
           </div>

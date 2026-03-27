@@ -662,6 +662,28 @@ a {
   font-weight: bold;
 }
 
+.btn-delete {
+  background-color: #b81c1c;
+  color: var(--text-color);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.btn-delete:hover {
+  background-color: #8b1515;
+  transform: scale(1.02);
+}
+
+.btn-delete:active {
+  transform: scale(0.98);
+}
+
 /* Error Styles */
 .error {
   max-width: 600px;

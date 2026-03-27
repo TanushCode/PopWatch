@@ -1,11 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+// Load bookings from localStorage
+const loadBookingsFromStorage = () => {
+  try {
+    const storedBookings = localStorage.getItem('popwatch_bookings');
+    return storedBookings ? JSON.parse(storedBookings) : [];
+  } catch (error) {
+    console.error('Failed to load bookings from localStorage:', error);
+    return [];
+  }
+};
+
 const initialState = {
   selectedMovie: null,
   selectedShowtime: null,
   selectedSeats: [],
   totalPrice: 0,
-  bookings: [],
+  bookings: loadBookingsFromStorage(),
 };
 
 const bookingSlice = createSlice({
@@ -43,7 +54,13 @@ const bookingSlice = createSlice({
           bookingDate: new Date().toLocaleDateString(),
         };
         state.bookings.push(booking);
+        // Save to localStorage
+        localStorage.setItem('popwatch_bookings', JSON.stringify(state.bookings));
       }
+    },
+    deleteBooking: (state, action) => {
+      state.bookings = state.bookings.filter(booking => booking.id !== action.payload);
+      localStorage.setItem('popwatch_bookings', JSON.stringify(state.bookings));
     },
     resetBooking: (state) => {
       state.selectedMovie = null;
@@ -60,6 +77,7 @@ export const {
   addSeat, 
   removeSeat, 
   confirmBooking, 
-  resetBooking 
+  resetBooking,
+  deleteBooking
 } = bookingSlice.actions;
 export default bookingSlice.reducer;
