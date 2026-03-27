@@ -4,6 +4,10 @@
   "installCommand": "npm ci",
   "framework": "vite",
   "outputDirectory": "dist",
-  "env": {},
-  "crons": []
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
